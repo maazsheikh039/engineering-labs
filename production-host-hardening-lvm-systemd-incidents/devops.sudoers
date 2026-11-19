@@ -1,0 +1,7 @@
+# /etc/sudoers.d/devops-reportapp (U003 lab) - delegated ReportApp operations
+# Full paths are mandatory; arguments must match exactly as written.
+Cmnd_Alias REPORTAPP_OPS = /usr/bin/systemctl restart reportapp.service, \
+                           /usr/bin/systemctl status reportapp.service --no-pager, \
+                           /usr/bin/journalctl -u reportapp.service --no-pager
+
+devops ALL=(root) REPORTAPP_OPS

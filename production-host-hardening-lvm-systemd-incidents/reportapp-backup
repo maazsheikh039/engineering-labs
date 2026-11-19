@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# reportapp-backup - mirror + archive ReportApp data with retention
+set -euo pipefail
+
+SRC_DATA="/srv/app/reportapp"
+SRC_CONF="/etc/reportapp"
+DEST="/srv/backup"
+MIRROR="$DEST/mirror"
+ARCHIVE_DIR="$DEST/archive"
+KEEP="${KEEP:-5}"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+ARCHIVE="$ARCHIVE_DIR/reportapp-$STAMP.tar.gz"
+
+log() { echo "[reportapp-backup] $*"; }
+
+if ! mountpoint -q "$DEST"; then
+  log "ERROR: $DEST is not a mounted filesystem - refusing to back up"
+  exit 1
+fi
+
+mkdir -p "$MIRROR" "$ARCHIVE_DIR"
+
+log "rsync mirror -> $MIRROR"
+rsync -a --delete "$SRC_DATA/" "$MIRROR/"
+
+log "creating $ARCHIVE"
+tar -czf "$ARCHIVE" -C / "${SRC_DATA#/}" "${SRC_CONF#/}"
+tar -tzf "$ARCHIVE" > /dev/null
+sha256sum "$ARCHIVE" > "$ARCHIVE.sha256"
+
+log "applying retention (keep $KEEP)"
+ls -1t "$ARCHIVE_DIR"/reportapp-*.tar.gz | tail -n +"$((KEEP + 1))" | while read -r old; do
+  rm -f "$old" "$old.sha256"
+  log "removed $old"
+done
+
+log "done: $(du -h "$ARCHIVE" | cut -f1) $ARCHIVE"

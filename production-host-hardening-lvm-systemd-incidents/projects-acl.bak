@@ -1,0 +1,48 @@
+# file: /srv/projects
+# owner: root
+# group: root
+user::rwx
+group::r-x
+other::r-x
+
+# file: /srv/projects/dropbox
+# owner: root
+# group: analysts
+# flags: -st
+user::rwx
+group::rwx
+other::---
+
+# file: /srv/projects/reports
+# owner: root
+# group: analysts
+# flags: -s-
+user::rwx
+group::rwx
+group:auditors:r-x
+mask::rwx
+other::---
+default:user::rwx
+default:group::rwx
+default:group:auditors:r-x
+default:mask::rwx
+default:other::---
+
+# file: /srv/projects/reports/q1.txt
+# owner: bob
+# group: analysts
+user::rw-
+group::rw-
+group:auditors:r--
+mask::rw-
+other::---
+
+# file: /srv/projects/reports/q2.txt
+# owner: bob
+# group: analysts
+user::rw-
+group::rwx	#effective:rw-
+group:auditors:r-x	#effective:r--
+mask::rw-
+other::---
+
