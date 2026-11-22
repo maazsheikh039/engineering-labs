@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "logtool"
+version = "0.1.0"
+description = "Streaming access-log analysis CLI"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "ipython==8.27.0",
+  "pytest==8.3.3",
+  "pytest-cov==5.0.0",
+  "ruff==0.6.9",
+  "black==24.8.0",
+  "mypy==1.11.2",
+]
+
+[project.scripts]
+logtool = "logtool.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["logtool"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 85
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src/logtool"]
